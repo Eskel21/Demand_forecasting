@@ -1,11 +1,10 @@
 import os
-
 import pandas as pd
 
-INPUT_FILE = "aggregated_data/demand_forecasting_daily_reduced.csv"
+INPUT_FILE = "aggregated_data/demand_forecasting_daily.csv"
 OUTPUT_FILE = "data/demand_forecasting_features.csv"
 
-TARGET = "Units Sold"
+os.makedirs("data", exist_ok=True)
 
 
 df = pd.read_csv(INPUT_FILE)
@@ -18,15 +17,15 @@ df = (
     .reset_index(drop=True)
 )
 
-print(f"\nLiczba obserwacji przed feature engineering: {len(df)}")
-print(f"Zakres dat: {df['Date'].min()} - {df['Date'].max()}")
+
+print("\nLiczba obserwacji przed feature engineering:", len(df))
 
 
-df["day_of_week"] = df["Date"].dt.dayofweek
+df["DayOfWeek"] = df["Date"].dt.dayofweek
+df["DayOfMonth"] = df["Date"].dt.day
+df["Month"] = df["Date"].dt.month
 
-df["month"] = df["Date"].dt.month
-
-df["week_of_year"] = (
+df["WeekOfYear"] = (
     df["Date"]
     .dt
     .isocalendar()
@@ -34,87 +33,84 @@ df["week_of_year"] = (
     .astype(int)
 )
 
-df["is_weekend"] = (
-    df["Date"]
-    .dt
-    .dayofweek
+df["IsWeekend"] = (
+    df["DayOfWeek"]
     .isin([5, 6])
     .astype(int)
 )
 
-df["lag_1"] = (
-    df[TARGET]
-    .shift(1)
-)
-
-df["lag_7"] = (
-    df[TARGET]
-    .shift(7)
-)
-
-df["lag_14"] = (
-    df[TARGET]
-    .shift(14)
-)
-
-df["lag_28"] = (
-    df[TARGET]
-    .shift(28)
-)
-
-
-df["rolling_mean_7"] = (
-    df[TARGET]
-    .shift(1)
-    .rolling(window=7)
-    .mean()
-)
-
-df["rolling_mean_14"] = (
-    df[TARGET]
-    .shift(1)
-    .rolling(window=14)
-    .mean()
-)
-
-df["rolling_mean_28"] = (
-    df[TARGET]
-    .shift(1)
-    .rolling(window=28)
-    .mean()
-)
-
-if "Seasonality" in df.columns:
-
-    seasonality_columns = pd.get_dummies(
-        df["Seasonality"],
-        prefix="Season",
-        dtype=int
-    )
-
-    df = pd.concat(
-        [df, seasonality_columns],
-        axis=1
-    )
-    df = df.drop(
-        columns=["Seasonality"]
-    )
-
-
-print("\nBrakujące wartości po utworzeniu lagów:")
-
-feature_columns = [
-    "lag_1",
-    "lag_7",
-    "lag_14",
-    "lag_28",
-    "rolling_mean_7",
-    "rolling_mean_14",
-    "rolling_mean_28"
+lags = [
+    1,
+    7,
+    14,
+    21,
+    28
 ]
 
-print(df[feature_columns].isna().sum())
+for lag in lags:
 
+    df[f"UnitsSold_Lag_{lag}"] = (
+        df["Units Sold"]
+        .shift(lag)
+    )
+
+rolling_windows = [
+    7,
+    14,
+    28
+]
+
+for window in rolling_windows:
+
+    df[f"UnitsSold_RollingMean_{window}"] = (
+        df["Units Sold"]
+        .shift(1)
+        .rolling(window=window)
+        .mean()
+    )
+
+
+for window in rolling_windows:
+
+    df[f"UnitsSold_RollingStd_{window}"] = (
+        df["Units Sold"]
+        .shift(1)
+        .rolling(window=window)
+        .std()
+    )
+
+feature_columns = [
+    "DayOfWeek",
+    "DayOfMonth",
+    "Month",
+    "WeekOfYear",
+    "IsWeekend",
+
+    *[
+        f"UnitsSold_Lag_{lag}"
+        for lag in lags
+    ],
+
+    *[
+        f"UnitsSold_RollingMean_{window}"
+        for window in rolling_windows
+    ],
+
+    *[
+        f"UnitsSold_RollingStd_{window}"
+        for window in rolling_windows
+    ]
+]
+
+print("\nBrakujące wartości po utworzeniu cech:")
+
+print(
+    df[feature_columns]
+    .isna()
+    .sum()
+)
+
+rows_before = len(df)
 
 df = (
     df
@@ -122,50 +118,31 @@ df = (
     .reset_index(drop=True)
 )
 
-print("WYNIK")
-
-print(f"\nLiczba obserwacji po feature engineering: {len(df)}")
+rows_after = len(df)
 
 print(
-    f"Zakres dat: {df['Date'].min()} - {df['Date'].max()}"
+    "\nUsunięte początkowe obserwacje:",
+    rows_before - rows_after
+)
+
+print(
+    "Liczba obserwacji po feature engineering:",
+    rows_after
+)
+
+
+print("\nZakres dat po feature engineering:")
+
+print(
+    df["Date"].min().date(),
+    "-",
+    df["Date"].max().date()
 )
 
 print("\nUtworzone cechy:")
 
 for column in feature_columns:
-    print(f" - {column}")
-
-print(" - day_of_week")
-print(" - month")
-print(" - week_of_year")
-print(" - is_weekend")
-
-season_columns = [
-    column
-    for column in df.columns
-    if column.startswith("Season_")
-]
-
-for column in season_columns:
-    print(f" - {column}")
-
-missing = df.isna().sum()
-
-missing = missing[
-    missing > 0
-]
-
-print("\nBrakujące wartości:")
-
-if len(missing) == 0:
-    print("Brak")
-else:
-    print(missing)
-
-os.makedirs(
-    os.path.dirname(OUTPUT_FILE),
-    exist_ok=True
-)
+    print("-", column)
 
 df.to_csv(
     OUTPUT_FILE,
@@ -173,5 +150,5 @@ df.to_csv(
 )
 
 print(
-    f"\nZapisano dane do: {OUTPUT_FILE}"
+    f"\nZapisano dane z cechami do: {OUTPUT_FILE}"
 )
