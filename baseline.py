@@ -12,17 +12,18 @@ TRAIN_FILE = "data/train.csv"
 VALIDATION_FILE = "data/validation.csv"
 
 OUTPUT_DIR = "outputs/baseline"
+
 PREDICTIONS_FILE = os.path.join(
     OUTPUT_DIR,
     "baseline_predictions.csv"
 )
+
 METRICS_FILE = os.path.join(
     OUTPUT_DIR,
     "baseline_metrics.csv"
 )
 
 TARGET = "Units Sold"
-SEASON_LENGTH = 7
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -42,7 +43,7 @@ validation = validation.sort_values("Date").reset_index(drop=True)
 
 
 print("\n" + "=" * 60)
-print("BASELINE - SEASONAL NAIVE (LAG 7)")
+print("BASELINE - SEASONAL NAIVE (PREVIOUS YEAR)")
 print("=" * 60)
 
 print(
@@ -61,28 +62,63 @@ print(
 
 
 # ============================================================
-# SEASONAL NAIVE FORECAST
+# ANALOGICZNY OKRES ROK WCZEŚNIEJ
 # ============================================================
 
-# Ostatnie 7 rzeczywistych wartości dostępnych w train
-last_season = (
-    train[TARGET]
-    .iloc[-SEASON_LENGTH:]
-    .to_numpy()
-)
-
-# Powtarzamy ostatni znany tydzień przez cały
-# 28-dniowy horyzont prognozy.
-predictions = np.resize(
-    last_season,
-    len(validation)
-)
-
+# Dla każdego dnia validation wyznaczamy analogiczną
+# datę rok wcześniej.
 validation_results = validation[
     ["Date", TARGET]
 ].copy()
 
-validation_results["Prediction"] = predictions
+validation_results["ReferenceDate"] = (
+    validation_results["Date"]
+    - pd.DateOffset(years=1)
+)
+
+
+# ============================================================
+# POBRANIE SPRZEDAŻY Z POPRZEDNIEGO ROKU
+# ============================================================
+
+historical_sales = train[
+    ["Date", TARGET]
+].copy()
+
+historical_sales = historical_sales.rename(
+    columns={
+        "Date": "ReferenceDate",
+        TARGET: "Prediction"
+    }
+)
+
+validation_results = validation_results.merge(
+    historical_sales,
+    on="ReferenceDate",
+    how="left"
+)
+
+
+# ============================================================
+# KONTROLA
+# ============================================================
+
+if validation_results["Prediction"].isna().any():
+
+    missing_dates = validation_results.loc[
+        validation_results["Prediction"].isna(),
+        "ReferenceDate"
+    ]
+
+    raise ValueError(
+        "Brak danych historycznych dla dat:\n"
+        + missing_dates.to_string(index=False)
+    )
+
+
+# ============================================================
+# BŁĄD
+# ============================================================
 
 validation_results["Error"] = (
     validation_results["Prediction"]
@@ -109,7 +145,6 @@ rmse = np.sqrt(
     )
 )
 
-# MAPE
 non_zero_mask = y_true != 0
 
 mape = (
@@ -125,7 +160,7 @@ mape = (
     * 100
 )
 
-# Bias = prediction - actual
+# Prediction - Actual
 bias = np.mean(
     y_pred - y_true
 )
@@ -138,7 +173,7 @@ bias = np.mean(
 metrics = pd.DataFrame(
     {
         "Model": [
-            "Seasonal Naive (lag 7)"
+            "Seasonal Naive (previous year)"
         ],
         "MAE": [
             mae
@@ -158,11 +193,17 @@ metrics = pd.DataFrame(
 print("\nMetryki baseline:")
 print(metrics.to_string(index=False))
 
-print("\nPierwsze prognozy:")
+print("\nPrognozy:")
 print(
-    validation_results.head(10).to_string(
-        index=False
-    )
+    validation_results[
+        [
+            "Date",
+            "ReferenceDate",
+            TARGET,
+            "Prediction",
+            "Error"
+        ]
+    ].to_string(index=False)
 )
 
 

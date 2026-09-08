@@ -1,0 +1,28 @@
+ANALIZA CZYNNIKÓW ZEWNĘTRZNYCH
+============================================================
+
+Korelacje Pearsona z Units Sold:
+
+Demand                0.9813
+Competitor Pricing    0.9052
+Epidemic             -0.8978
+Weather_Sunny         0.1750
+Weather_Snowy        -0.1199
+Weather_Rainy        -0.1021
+Weather_Cloudy        0.0433
+
+Sprzedaż według Epidemic:
+
+          Count     Mean  Median     Std
+Epidemic                                
+0           608  9581.92  9551.5  738.97
+1           152  6085.97  6093.5  417.31
+
+Sprzedaż według Seasonality:
+
+             Count     Mean  Median      Std
+Seasonality                                 
+Summer         184  9575.79  9937.0  1470.98
+Autumn         182  8846.26  9082.0  1119.43
+Winter         210  8777.05  9316.0  1526.66
+Spring         184  8346.36  9097.0  1795.74
