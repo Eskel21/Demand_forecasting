@@ -4,18 +4,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-app = dash.Dash(
-    __name__,
-    external_scripts=['https://cdn.plot.ly/plotly-locale-pl-latest.js']
-)
-
-app.layout = html.Div([
-    dcc.Graph(
-        figure=fig,
-        config={'locale': 'pl'}  # Włączenie języka polskiego
-    )
-])
-
 st.set_page_config(
     page_title="Prognoza sprzedaży w szstukach",
     page_icon="assets/logo.webp",
