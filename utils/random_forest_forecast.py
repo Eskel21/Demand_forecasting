@@ -14,10 +14,10 @@ from sklearn.metrics import (
 # USTAWIENIA
 # ============================================================
 
-TRAIN_FILE = "data/train.csv"
-VALIDATION_FILE = "data/validation.csv"
+TRAIN_FILE = "../data/train.csv"
+VALIDATION_FILE = "../data/validation.csv"
 
-OUTPUT_DIR = "outputs/random_forest"
+OUTPUT_DIR = "../outputs/random_forest"
 
 FORECAST_FILE = os.path.join(
     OUTPUT_DIR,

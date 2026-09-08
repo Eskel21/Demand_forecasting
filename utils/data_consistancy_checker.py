@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Ścieżka do pliku
-FILE_PATH = "data/demand_forecasting.csv"
+FILE_PATH = "../data/demand_forecasting.csv"
 
 # WCZYTANIE DANYCH
 df = pd.read_csv(FILE_PATH)

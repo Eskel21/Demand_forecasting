@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 
-INPUT_FILE = "aggregated_data/demand_forecasting_daily.csv"
-OUTPUT_FILE = "data/demand_forecasting_features.csv"
+INPUT_FILE = "../aggregated_data/demand_forecasting_daily.csv"
+OUTPUT_FILE = "../data/demand_forecasting_features.csv"
 
-os.makedirs("data", exist_ok=True)
+os.makedirs("../data", exist_ok=True)
 
 
 df = pd.read_csv(INPUT_FILE)

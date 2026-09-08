@@ -15,9 +15,9 @@ from sklearn.metrics import (
 
 from xgboost import XGBRegressor
 
-INPUT_FILE = "data/train.csv"
+INPUT_FILE = "../data/train.csv"
 
-OUTPUT_DIR = "outputs/model_selection"
+OUTPUT_DIR = "../outputs/model_selection"
 OUTPUT_FILE = os.path.join(
     OUTPUT_DIR,
     "model_selection_results.csv"

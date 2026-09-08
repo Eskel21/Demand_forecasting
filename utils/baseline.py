@@ -8,10 +8,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 # USTAWIENIA
 # ============================================================
 
-TRAIN_FILE = "data/train.csv"
-VALIDATION_FILE = "data/validation.csv"
+TRAIN_FILE = "../data/train.csv"
+VALIDATION_FILE = "../data/validation.csv"
 
-OUTPUT_DIR = "outputs/baseline"
+OUTPUT_DIR = "../outputs/baseline"
 
 PREDICTIONS_FILE = os.path.join(
     OUTPUT_DIR,

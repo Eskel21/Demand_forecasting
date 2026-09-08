@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 
-TRAIN_FILE = "data/train.csv"
-VALIDATION_FILE = "data/validation.csv"
+TRAIN_FILE = "../data/train.csv"
+VALIDATION_FILE = "../data/validation.csv"
 
-OUTPUT_DIR = "outputs/baseline"
+OUTPUT_DIR = "../outputs/baseline"
 OUTPUT_FILE = os.path.join(
     OUTPUT_DIR,
     "baseline_forecast.csv"

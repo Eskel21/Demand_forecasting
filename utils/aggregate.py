@@ -2,8 +2,8 @@ import pandas as pd
 
 # WCZYTANIE DANYCH
 
-INPUT_FILE = "data/demand_forecasting.csv"
-OUTPUT_FILE = "aggregated_data/demand_forecasting_daily.csv"
+INPUT_FILE = "../data/demand_forecasting.csv"
+OUTPUT_FILE = "../aggregated_data/demand_forecasting_daily.csv"
 
 df = pd.read_csv(INPUT_FILE)
 

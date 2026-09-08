@@ -6,9 +6,9 @@ from boruta import BorutaPy
 from sklearn.ensemble import RandomForestRegressor
 
 
-INPUT_FILE = "data/train.csv"
+INPUT_FILE = "../data/train.csv"
 
-OUTPUT_DIR = "outputs/feature_selection"
+OUTPUT_DIR = "../outputs/feature_selection"
 OUTPUT_FILE = os.path.join(
     OUTPUT_DIR,
     "boruta_results.csv"

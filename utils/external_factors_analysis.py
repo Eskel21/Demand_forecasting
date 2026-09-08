@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-INPUT_FILE = "aggregated_data/demand_forecasting_daily.csv"
-OUTPUT_DIR = "outputs/external_factors_analysis"
+INPUT_FILE = "../aggregated_data/demand_forecasting_daily.csv"
+OUTPUT_DIR = "../outputs/external_factors_analysis"
 
 TARGET = "Units Sold"
 

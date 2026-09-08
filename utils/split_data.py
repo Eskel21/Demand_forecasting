@@ -1,14 +1,14 @@
 import os
 import pandas as pd
 
-INPUT_FILE = "data/demand_forecasting_features.csv"
+INPUT_FILE = "../data/demand_forecasting_features.csv"
 
-TRAIN_FILE = "data/train.csv"
-VALIDATION_FILE = "data/validation.csv"
+TRAIN_FILE = "../data/train.csv"
+VALIDATION_FILE = "../data/validation.csv"
 
 VALIDATION_DAYS = 28
 
-os.makedirs("data", exist_ok=True)
+os.makedirs("../data", exist_ok=True)
 
 df = pd.read_csv(INPUT_FILE)
 

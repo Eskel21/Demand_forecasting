@@ -8,7 +8,7 @@ from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-DEFAULT_INPUT_FILE = "data/train.csv"
+DEFAULT_INPUT_FILE = "../data/train.csv"
 
 OUTPUT_DIR = "outputs/external_forecasting"
 
