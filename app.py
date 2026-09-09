@@ -629,7 +629,64 @@ def show_top_products():
         "MAPE przedstawia średni błąd procentowy. "
         "Każdy produkt posiada osobno wytrenowany model Random Forest."
     )
+    st.divider()
 
+    # =====================================================
+    # INTERPRETACJA WYNIKÓW
+    # =====================================================
+
+    st.markdown("#### Interpretacja wyników")
+
+    for product_id in selected_products:
+
+        metric = metrics[product_id]
+
+        mae = metric["MAE"]
+        rmse = metric["RMSE"]
+        mape = metric["MAPE"]
+        bias = metric["Bias"]
+
+        if mape < 10:
+            accuracy_text = (
+                "Model osiąga dobrą dokładność prognoz – "
+                "średni błąd procentowy nie przekracza 10%."
+            )
+        elif mape < 15:
+            accuracy_text = (
+                "Model osiąga zadowalającą dokładność prognoz – "
+                "średni błąd procentowy mieści się w przedziale 10–15%."
+            )
+        else:
+            accuracy_text = (
+                "Model charakteryzuje się większym błędem procentowym, "
+                "dlatego prognozy należy interpretować z większą ostrożnością."
+            )
+
+        if bias > 0:
+            bias_text = (
+                f"Dodatni Bias ({bias:+.2f}) wskazuje na niewielką "
+                "tendencję modelu do zawyżania prognoz."
+            )
+        elif bias < 0:
+            bias_text = (
+                f"Ujemny Bias ({bias:+.2f}) wskazuje na niewielką "
+                "tendencję modelu do zaniżania prognoz."
+            )
+        else:
+            bias_text = (
+                "Bias równy 0 wskazuje na brak systematycznej "
+                "tendencji do zawyżania lub zaniżania prognoz."
+            )
+
+        st.markdown(
+            f"""
+            **{product_id}** — średni bezwzględny błąd prognozy wynosi
+            **{mae:.2f} szt.**, natomiast RMSE wynosi **{rmse:.2f} szt.**.
+            MAPE na poziomie **{mape:.2f}%** oznacza, że prognoza odbiega
+            przeciętnie od rzeczywistej sprzedaży o około **{mape:.1f}%**.
+            {accuracy_text} {bias_text}
+            """
+        )
     # =====================================================
     # SZCZEGÓŁOWE WARTOŚCI
     # =====================================================
@@ -686,10 +743,6 @@ def show_top_products():
             use_container_width=True,
             hide_index=True
         )
-
-    # =====================================================
-    # DANE HISTORYCZNE + PROGNOZA
-    # =====================================================
 
     st.divider()
     st.subheader(
